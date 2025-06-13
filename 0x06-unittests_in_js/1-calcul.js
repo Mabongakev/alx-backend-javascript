@@ -1,16 +1,18 @@
+#!/usr/bin/env node
+
+const Utils = require('./utils');
+
+/**
+ * Perform math operations and return the answer.
+ * @param type {string} - The type of operation to be perform. Allowed
+ * options are 'SUM', 'SUBTRACT', 'DIVIDE'.
+ * @param a {number} - The first number.
+ * @param b {number} - The second number.
+ * @returns {number} The sum of the two numbers rounded up.
+ */
 function calculateNumber(type, a, b) {
-    if (typeof (type) == String || type == 'SUM' || type == 'SUBTRACT' || type == 'DIVIDE') {
-        if (type == 'SUM') {
-            return Math.round(a) + Math.round(b);
-        } else if (type == 'SUBTRACT') {
-            return Math.round(a) - Math.round(b);
-        } else if (type == 'DIVIDE') {
-            if (Math.round(b) != 0) {
-                return Math.round(a) / Math.round(b);
-            }
-            return 'Error';
-        }
-    } else {
-        return 'Error'
-    }
+  return Utils.calculateNumber(type, a, b);
 }
+
+module.exports = calculateNumber;
+

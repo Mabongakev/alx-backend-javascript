@@ -1,24 +1,95 @@
-const assert = require('assert');
-const { it, describe } = require('mocha');
-const calculateNumber = require('./1-calcul');
+#!/usr/bin/env node
 
-describe('calculateNumber', () => {
-    it('checking if operation is correct 1', () => {
-        assert.equal(calculateNumber('SUM', 1.4, 4.5), 6);
+const assert = require('assert');
+const { describe, it } = require('mocha');
+const calculateNumber = require('./1-calcul');
+const {
+  additionFixtures,
+  divisionFixtures,
+  subtractionFixtures,
+  invalidArgsFixtures,
+  divisionByZeroFixtures,
+} = require('./fixtures');
+const Utils = require('./utils');
+
+describe('calculateNumber function', () => {
+  describe('general error handling capabilities', () => {
+    it('handles invalid operation types well', () => {
+      assert.throws(() => calculateNumber('BAD', 4, 5), Error);
     });
-    it('checking if operation is correct 2', () => {
-        assert.equal(calculateNumber('SUBTRACT', 1.4, 4.5), -4);
+
+    ['sum', 'subtract', 'division'].forEach((invalidOperationType) => {
+      it(`fails when operation type is lowercase instead of uppercase: ${invalidOperationType}`,
+        () => {
+          assert.throws(() => calculateNumber(invalidOperationType, 1, 2), Error);
+        });
     });
-    it('checking if operation is correct 3', () => {
-        assert.equal(calculateNumber('DIVIDE', 1.4, 4.5), 0.2);
+  });
+
+  describe('adding numbers with the SUM operation type', () => {
+    const operationType = 'SUM';
+
+    additionFixtures.forEach(({ args, expected }) => {
+      it(`correctly adds ${args[0]} and ${args[1]} as ${expected}`, () => {
+        const res = calculateNumber(operationType, ...args);
+        assert.strictEqual(res, expected);
+      });
     });
-    it('checking if operation is correct 4', () => {
-        assert.equal(calculateNumber('DIVIDE', 1.4, 0), 'Error');
+
+    invalidArgsFixtures.forEach(({ args, expected }) => {
+      it(`throws a TypeError when ${Utils.getType(args[0])} and ${Utils.getType(args[1])} are passed as arguments`,
+        () => {
+          assert.throws(() => calculateNumber(operationType, ...args),
+            expected);
+        });
     });
-    it('checking correct type for operation 1', () => {
-        assert.equal(calculateNumber(5, 1, 4), 'Error');
+  });
+
+  describe('subtracting numbers with the SUBTRACT operation type',
+    () => {
+      const operationType = 'SUBTRACT';
+
+      subtractionFixtures.forEach(({ args, expected }) => {
+        it(`correctly subtracts ${args[1]} from ${args[0]} as ${expected}`,
+          () => {
+            const res = calculateNumber(operationType, ...args);
+            assert.strictEqual(res, expected);
+          });
+      });
+
+      invalidArgsFixtures.forEach(({ args, expected }) => {
+        it(`throws a TypeError when ${Utils.getType(args[0])} and ${Utils.getType(args[1])} are passed as arguments`,
+          () => {
+            assert.throws(() => calculateNumber(operationType, ...args),
+              expected);
+          });
+      });
     });
-    it('checking correct type for operation 2', () => {
-        assert.equal(calculateNumber('plus', 1, 4), 'Error');
+
+  describe('dividing numbers with the DIVIDE operation type',
+    () => {
+      const operationType = 'DIVIDE';
+
+      divisionFixtures.forEach(({ args, expected }) => {
+        it(`correctly divides ${args[0]} and ${args[1]} as ${expected}`,
+          () => {
+            const res = calculateNumber(operationType, ...args);
+            assert.strictEqual(res, expected);
+          });
+      });
+
+      invalidArgsFixtures.forEach(({ args, expected }) => {
+        it(`throws a TypeError when ${Utils.getType(args[0])} and ${Utils.getType(args[1])} are passed as arguments`,
+          () => {
+            assert.throws(() => calculateNumber(operationType, ...args),
+              expected);
+          });
+      });
+
+      divisionByZeroFixtures.forEach(({ args, expected }) => {
+        it("return 'Error' for division by zero attempts", () => {
+          assert.strictEqual(calculateNumber(operationType, ...args), expected);
+        });
+      });
     });
 });
