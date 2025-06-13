@@ -1,24 +1,31 @@
-const assert = require('assert');
-const { it, describe } = require('mocha');
-const calculateNumber = require('./1-calcul');
+#!/usr/bin/env node
 
-describe('calculateNumber', () => {
-    it('checking if operation is correct 1', () => {
-        assert.equal(calculateNumber('SUM', 1.4, 4.5), 6);
+const assert = require('assert');
+const { describe, it } = require('mocha');
+const calculateNumber = require('./0-calcul');
+const { additionFixtures, invalidArgsFixtures } = require('./fixtures');
+const Utils = require('./utils');
+
+/**
+ * Test the `calculateNumber()` function.
+ */
+describe('calculateNumber()', () => {
+  additionFixtures.forEach(({ args, expected }) => {
+    it(`correctly adds ${args[0]} and ${args[1]} as ${expected}`, () => {
+      const res = calculateNumber(...args);
+      assert.strictEqual(res, expected);
     });
-    it('checking if operation is correct 2', () => {
-        assert.equal(calculateNumber('SUBTRACT', 1.4, 4.5), -4);
-    });
-    it('checking if operation is correct 3', () => {
-        assert.equal(calculateNumber('DIVIDE', 1.4, 4.5), 0.2);
-    });
-    it('checking if operation is correct 4', () => {
-        assert.equal(calculateNumber('DIVIDE', 1.4, 0), 'Error');
-    });
-    it('checking correct type for operation 1', () => {
-        assert.equal(calculateNumber(5, 1, 4), 'Error');
-    });
-    it('checking correct type for operation 2', () => {
-        assert.equal(calculateNumber('plus', 1, 4), 'Error');
-    });
+  });
+
+  invalidArgsFixtures.forEach(({ args, expected }) => {
+    it(`throws a TypeError when ${Utils.getType(args[0])} and ${Utils.getType(args[1])} are passed as arguments`,
+      () => {
+        assert.throws(() => calculateNumber(...args), expected);
+      });
+  });
+
+  it('throws a TypeError when any or all of the arguments are omitted', () => {
+    assert.throws(() => calculateNumber(4), TypeError);
+    assert.throws(() => calculateNumber(), TypeError);
+  });
 });
